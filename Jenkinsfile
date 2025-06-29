@@ -2,40 +2,37 @@ pipeline {
     agent any
 
     stages {
-        stage('Checkout the repository') {
-            steps {
-                checkout scm
-            }
-        }
-
-        stage('Restore the project') {
+		stage ('Checkout') {
+			steps { 
+				checkout scm
+			}
+		}
+        stage('Restore dependencies') {
             steps {
                 bat 'dotnet restore'
             }
         }
-
-
         stage('Build the project') {
             steps {
-                bat 'dotnet build'
+                bat 'dotnet build --no-restore'
             }
         }
-
-        stage('Run tests') {
+        stage('Test the project') {
             steps {
-                bat 'dotnet test'
+                bat 'dotnet test --no-build --verbosity normal'
             }
         }
     }
+
     post {
         always {
             echo 'Pipeline completed'
         }
         success {
-            echo 'Build succeeded'
+            echo '✅ Build finished successfully'
         }
         failure {
-            echo 'Build failed'
+            echo '❌ Build failed (successfully :?)'
         }
     }
 }
